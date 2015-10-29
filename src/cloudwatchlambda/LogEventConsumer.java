@@ -66,8 +66,8 @@ public class LogEventConsumer {
 	}
 	
 	//public void invokeService(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
-		public void invokeService(String secretKey, String accessKeyID, String LogglyToken, String LogglyTags) throws IOException
-		{
+	public void invokeService(String secretKey, String accessKeyID, String LogglyToken, String LogglyTags) throws IOException
+	{
 
 		/**
 		 * 
@@ -87,7 +87,7 @@ public class LogEventConsumer {
 		}
 				
 		DescribeLogGroupsResult describeLogGroupsResult = logsClient.describeLogGroups();
-		//System.out.println("Log Groups : " + describeLogGroupsResult.getLogGroups());
+		
 		describeLogGroupsResult.getLogGroups().forEach(logGroup -> {
 			
 			DescribeLogStreamsRequest describeLogStreamsRequest = new DescribeLogStreamsRequest().withLogGroupName(logGroup.getLogGroupName());
@@ -100,11 +100,8 @@ public class LogEventConsumer {
 						.withLogGroupName(describeLogStreamsRequest.getLogGroupName())
 						.withLogStreamName(stream.getLogStreamName());
 				
-				//System.out.println("Log Group Names : " + describeLogStreamsRequest.getLogGroupName());
-				//System.out.println("Log Stream Names : " + stream.getLogStreamName());
-				
 				Date endDate = new Date();
-				Date startDate = new Date(endDate.getTime() - (5*60*1000));
+				Date startDate = new Date(endDate.getTime() - (5*60*1000)); 	// 5 minutes
 				
 				getLogEventsRequest.setStartTime(startDate.getTime());
 				getLogEventsRequest.setEndTime(endDate.getTime());
@@ -113,7 +110,6 @@ public class LogEventConsumer {
 					
 					GetLogEventsResult getLogEventsResult = logsClient.getLogEvents(getLogEventsRequest);
 					List<OutputLogEvent> events = getLogEventsResult.getEvents();
-					//System.out.println("Log Events : " + getLogEventsResult.getEvents());
 					
 					if (events.size() == 0) {
 						break;
@@ -129,8 +125,6 @@ public class LogEventConsumer {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						
-						//System.out.println("Log Entry : " + logEntry);
 					});
 					
 					getLogEventsRequest = new GetLogEventsRequest().withNextToken(getLogEventsResult.getNextForwardToken())
@@ -142,12 +136,12 @@ public class LogEventConsumer {
 				
 				/**
 				 * 
-				 * execute the GET to loggly
+				 * execute the POST to loggly
 				 * 
 				 */
 				
 				try {
-					HttpURLConnection connection = (HttpURLConnection) new URL("http://logs-01.loggly.com/bulk/"
+					HttpURLConnection connection = (HttpURLConnection) new URL("https://logs-01.loggly.com/bulk/"
 							.concat(LOGGLY_API_KEY)
 							.concat("/tag/")
 							.concat(LogglyTags)
@@ -172,7 +166,6 @@ public class LogEventConsumer {
 					
 				} catch (Exception e) {
 					e.printStackTrace();
-					//logger.log(e.getMessage());
 				}
 			});
 		});
