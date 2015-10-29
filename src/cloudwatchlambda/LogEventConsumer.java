@@ -66,7 +66,7 @@ public class LogEventConsumer {
 	}
 	
 	//public void invokeService(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
-	public void invokeService(String secretKey, String accessKeyID, String LogglyToken, String LogglyTags) throws IOException
+	public void invokeService(String SecretKey, String AccessKeyID, String LogglyToken, String LogglyTags) throws IOException
 	{
 
 		/**
@@ -79,7 +79,7 @@ public class LogEventConsumer {
 		 */
 			
 		try {
-			setAWSCredentials(secretKey, accessKeyID);
+			setAWSCredentials(SecretKey, AccessKeyID);
 			setLogglyConfiguration(LogglyToken);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
