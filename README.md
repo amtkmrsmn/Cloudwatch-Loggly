@@ -5,6 +5,8 @@ We can configure the Lambda function using config.properties file
 - Loggly Token, Loggly Tags 
 - AWS Access Key ID, AWS Secret Key
 
+We have to set Lambda function to execute in every 5 minutes.
+
 Steps:
 
 1. Describe all Log Groups in CloudWatch
