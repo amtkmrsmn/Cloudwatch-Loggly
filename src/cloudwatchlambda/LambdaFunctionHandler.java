@@ -11,11 +11,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, Object> {
     @Override
     public Object handleRequest(Object input, Context context) {
         context.getLogger().log("Input: " + input);
-
-        String args[] = {};
-        main(args);
-        
-        // TODO: implement your handler
+        main(null);
         return null;
     }
     
@@ -23,8 +19,6 @@ public class LambdaFunctionHandler implements RequestHandler<Object, Object> {
     {
     	try
     	{
-    		
-
     		InputStream fileInput = LambdaFunctionHandler.class.getClassLoader().getResourceAsStream("config.properties");
     		Properties prop = new Properties();
     		prop.load(fileInput);
