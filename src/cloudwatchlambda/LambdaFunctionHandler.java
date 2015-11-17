@@ -11,7 +11,9 @@ public class LambdaFunctionHandler implements RequestHandler<Object, Object> {
     @Override
     public Object handleRequest(Object input, Context context) {
         context.getLogger().log("Input: " + input);
+
         main(null);
+        
         return null;
     }
     
@@ -32,9 +34,9 @@ public class LambdaFunctionHandler implements RequestHandler<Object, Object> {
     		LogEventConsumer lec = new LogEventConsumer();
     		lec.invokeService(SecretKey, AccessKeyId, LogglyToken, LogglyTags);
     	}
-    	catch(Exception e)
+    	catch(Exception ex)
     	{
-    		e.printStackTrace();
+			  ex.printStackTrace();
     	}
     }
 }
