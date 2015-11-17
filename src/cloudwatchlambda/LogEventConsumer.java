@@ -36,28 +36,25 @@ import com.amazonaws.util.json.JSONObject;
 
 public class LogEventConsumer {
 	
-	
-	
 	private static AWSLogs logsClient;
 	static  AWSCredentials credentials;
 	private static String LOGGLY_API_KEY;
 	
 	public static void setAWSCredentials(String SecretKey, String AccessKeyID) throws Exception
 	{
-			credentials = new AWSCredentials() {
-				
-				@Override
-				public String getAWSSecretKey() {
-					return SecretKey;
-				}
-				
-				@Override
-				public String getAWSAccessKeyId() {
-					return AccessKeyID;
-				}
-			};
+		credentials = new AWSCredentials() {
+			@Override
+			public String getAWSSecretKey() {
+				return SecretKey;
+			}
 			
-			logsClient = new AWSLogsClient(credentials);
+			@Override
+			public String getAWSAccessKeyId() {
+				return AccessKeyID;
+			}
+		};
+		
+		logsClient = new AWSLogsClient(credentials);
 	}
 	
 	public static void setLogglyConfiguration(String LogglyToken)
@@ -65,17 +62,14 @@ public class LogEventConsumer {
 		LOGGLY_API_KEY = new String(LogglyToken);
 	}
 	
-	
-	
 	private String getEventTimestamp(Date eventTime)
 	{
 		ZonedDateTime zonalTime = ZonedDateTime.ofInstant(eventTime.toInstant(),ZoneId.systemDefault());
 		return zonalTime.format(DateTimeFormatter.ISO_INSTANT);
 	}
 	
-	
 	public void invokeService(String secretKey, String accessKeyID, String LogglyToken, String LogglyTags) throws IOException
-		{
+	{
 		/**
 		 * 
 		 * Get log groups 
