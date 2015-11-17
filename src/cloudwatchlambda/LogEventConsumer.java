@@ -101,7 +101,7 @@ public class LogEventConsumer {
 						.withLogStreamName(stream.getLogStreamName());
 								
 				Date endDate = new Date();
-				Date startDate = new Date(endDate.getTime() - (60*60*1000));
+				Date startDate = new Date(endDate.getTime() - (5*60*1000));
 				
 				getLogEventsRequest.setStartTime(startDate.getTime());
 				getLogEventsRequest.setEndTime(endDate.getTime());
