@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.logs.AWSLogs;
 import com.amazonaws.services.logs.AWSLogsClient;
-import com.amazonaws.services.logs.model.DeleteLogStreamRequest;
 import com.amazonaws.services.logs.model.DescribeLogGroupsResult;
 import com.amazonaws.services.logs.model.DescribeLogStreamsRequest;
 import com.amazonaws.services.logs.model.DescribeLogStreamsResult;
@@ -46,13 +48,11 @@ public class LogEventConsumer {
 				
 				@Override
 				public String getAWSSecretKey() {
-					// TODO Auto-generated method stub
 					return SecretKey;
 				}
 				
 				@Override
 				public String getAWSAccessKeyId() {
-					// TODO Auto-generated method stub
 					return AccessKeyID;
 				}
 			};
@@ -65,10 +65,17 @@ public class LogEventConsumer {
 		LOGGLY_API_KEY = new String(LogglyToken);
 	}
 	
-	//public void invokeService(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
-	public void invokeService(String SecretKey, String AccessKeyID, String LogglyToken, String LogglyTags) throws IOException
+	
+	
+	private String getEventTimestamp(Date eventTime)
 	{
-
+		ZonedDateTime zonalTime = ZonedDateTime.ofInstant(eventTime.toInstant(),ZoneId.systemDefault());
+		return zonalTime.format(DateTimeFormatter.ISO_INSTANT);
+	}
+	
+	
+	public void invokeService(String secretKey, String accessKeyID, String LogglyToken, String LogglyTags) throws IOException
+		{
 		/**
 		 * 
 		 * Get log groups 
@@ -79,10 +86,9 @@ public class LogEventConsumer {
 		 */
 			
 		try {
-			setAWSCredentials(SecretKey, AccessKeyID);
+			setAWSCredentials(secretKey, accessKeyID);
 			setLogglyConfiguration(LogglyToken);
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 				
@@ -99,9 +105,9 @@ public class LogEventConsumer {
 				GetLogEventsRequest getLogEventsRequest = new GetLogEventsRequest().withStartFromHead(Boolean.TRUE)
 						.withLogGroupName(describeLogStreamsRequest.getLogGroupName())
 						.withLogStreamName(stream.getLogStreamName());
-				
+								
 				Date endDate = new Date();
-				Date startDate = new Date(endDate.getTime() - (5*60*1000)); 	// 5 minutes
+				Date startDate = new Date(endDate.getTime() - (60*60*1000));
 				
 				getLogEventsRequest.setStartTime(startDate.getTime());
 				getLogEventsRequest.setEndTime(endDate.getTime());
@@ -117,11 +123,13 @@ public class LogEventConsumer {
 					
 					events.forEach(event -> {
 						try {
-							logEntry.append(new JSONObject().put("timestamp", new Date(event.getTimestamp()))
+							
+							logEntry.append(new JSONObject().put("timestamp", getEventTimestamp(new Date(event.getTimestamp())))
 									.put("logGroupName", describeLogStreamsRequest.getLogGroupName())
 									.put("logStreamName", stream.getLogStreamName())
 									.put("message", event.getMessage())
 									.put("ingestionTime", new Date(event.getIngestionTime()).toString()));
+							
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -136,12 +144,12 @@ public class LogEventConsumer {
 				
 				/**
 				 * 
-				 * execute the POST to loggly
+				 * execute the GET to loggly
 				 * 
 				 */
 				
 				try {
-					HttpURLConnection connection = (HttpURLConnection) new URL("https://logs-01.loggly.com/bulk/"
+					HttpURLConnection connection = (HttpURLConnection) new URL("http://logs-01.loggly.com/bulk/"
 							.concat(LOGGLY_API_KEY)
 							.concat("/tag/")
 							.concat(LogglyTags)
@@ -150,9 +158,8 @@ public class LogEventConsumer {
 					connection.setRequestMethod("POST");
 					connection.setRequestProperty("content-type", "text/plain");
 					connection.setDoOutput(true);
-					
-					
-					byte[] outputInBytes = logEntry.toString().replace("}{", "}\n{").getBytes("UTF-8");
+				
+					byte[] outputInBytes = logEntry.toString().replace("}{", "}"+System.getProperty("line.separator")+"{").getBytes("UTF-8");
 					OutputStream os = connection.getOutputStream();
 					os.write( outputInBytes );    
 					os.close();
