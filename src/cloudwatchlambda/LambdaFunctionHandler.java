@@ -36,7 +36,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, Object> {
     	}
     	catch(Exception ex)
     	{
-			  ex.printStackTrace();
+		ex.printStackTrace();
     	}
     }
 }
