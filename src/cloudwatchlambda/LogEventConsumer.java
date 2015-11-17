@@ -40,26 +40,26 @@ public class LogEventConsumer {
 	static  AWSCredentials credentials;
 	private static String LOGGLY_API_KEY;
 	
-	public static void setAWSCredentials(String SecretKey, String AccessKeyID) throws Exception
+	public static void setAWSCredentials(String secretKey, String accessKeyID) throws Exception
 	{
 		credentials = new AWSCredentials() {
 			@Override
 			public String getAWSSecretKey() {
-				return SecretKey;
+				return secretKey;
 			}
 			
 			@Override
 			public String getAWSAccessKeyId() {
-				return AccessKeyID;
+				return accessKeyID;
 			}
 		};
 		
 		logsClient = new AWSLogsClient(credentials);
 	}
 	
-	public static void setLogglyConfiguration(String LogglyToken)
+	public static void setLogglyConfiguration(String logglyToken)
 	{
-		LOGGLY_API_KEY = new String(LogglyToken);
+		LOGGLY_API_KEY = new String(logglyToken);
 	}
 	
 	private String getEventTimestamp(Date eventTime)
@@ -68,7 +68,7 @@ public class LogEventConsumer {
 		return zonalTime.format(DateTimeFormatter.ISO_INSTANT);
 	}
 	
-	public void invokeService(String secretKey, String accessKeyID, String LogglyToken, String LogglyTags) throws IOException
+	public void invokeService(String secretKey, String accessKeyID, String logglyToken, String logglyTags) throws IOException
 	{
 		/**
 		 * 
@@ -81,7 +81,7 @@ public class LogEventConsumer {
 			
 		try {
 			setAWSCredentials(secretKey, accessKeyID);
-			setLogglyConfiguration(LogglyToken);
+			setLogglyConfiguration(logglyToken);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -146,7 +146,7 @@ public class LogEventConsumer {
 					HttpURLConnection connection = (HttpURLConnection) new URL("http://logs-01.loggly.com/bulk/"
 							.concat(LOGGLY_API_KEY)
 							.concat("/tag/")
-							.concat(LogglyTags)
+							.concat(logglyTags)
 							.concat("/")).openConnection();
 							
 					connection.setRequestMethod("POST");
